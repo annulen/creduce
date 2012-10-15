@@ -20,7 +20,7 @@ class TemplateName;
 }
 
 class SubstituteClassTemplateParameterASTVisitor;
-class SubstituteClassTemplateParameterSpecializationTypeRewriteVisitor;
+class SubstituteClassTemplateParameterRewriteVisitor;
 
 class SubstituteClassTemplateParameter : public Transformation {
 friend class SubstituteClassTemplateParameterASTVisitor;
@@ -30,7 +30,7 @@ public:
   SubstituteClassTemplateParameter(const char *TransName, const char *Desc)
     : Transformation(TransName, Desc),
       CollectionVisitor(0),
-//      RewriteVisitor(0),
+      RewriteVisitor(0),
       TheClassTemplateDecl(0),
       TheTemplateName(0)
   {}
@@ -45,14 +45,11 @@ private:
 
   virtual void HandleTranslationUnit(clang::ASTContext &Ctx);
 
-  bool isValidClassTemplateParam(clang::ClassTemplateDecl *D, unsigned paramIdx);
-
-
   ClassTemplateDeclSet VisitedDecls;
 
   SubstituteClassTemplateParameterASTVisitor *CollectionVisitor;
 
-//  SubstituteClassTemplateParameterRewriteVisitor *RewriteVisitor;
+  SubstituteClassTemplateParameterRewriteVisitor *RewriteVisitor;
 
   clang::ClassTemplateDecl *TheClassTemplateDecl;
 

@@ -46,6 +46,28 @@ public:
 private:
     SubstituteClassTemplateParameter *ConsumerInstance;
 };
+
+class SubstituteClassTemplateParameterRewriteVisitor : public
+   RecursiveASTVisitor<SubstituteClassTemplateParameterRewriteVisitor> {
+public:
+    explicit SubstituteClassTemplateParameterRewriteVisitor(
+            SubstituteClassTemplateParameter *Instance)
+        : ConsumerInstance(Instance)
+    {}
+
+    bool VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc);
+
+private:
+    SubstituteClassTemplateParameter *ConsumerInstance;
+};
+
+bool SubstituteClassTemplateParameterRewriteVisitor::VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc)
+{
+    printf("Here!\n");
+    return true;
+}
+
+/*
 static void PrintTemplateParameters(Decl *D,
     const TemplateParameterList *Params, const TemplateArgumentList *Args = 0) {
     printf("\nPrintTemplateParameters\n");
@@ -111,6 +133,21 @@ static void PrintTemplateParameters(Decl *D,
   Out << "> ";
   printf("\n");
 }
+*/
+
+bool isValidClassTemplateParam(clang::ClassTemplateDecl *D, unsigned paramIdx)
+{
+    const TemplateArgument *firstArg = 0;
+    for (ClassTemplateDecl::spec_iterator I = D->spec_begin(), E = D->spec_end();
+            I != E; ++I) {
+        const TemplateArgument &curArg = (*I)->getTemplateArgs()[paramIdx];
+        if (!firstArg)
+            firstArg = &curArg;
+        else if (!curArg.structurallyEquals(*firstArg))
+            return false;
+    }
+    return true;
+}
 
 bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTemplateDecl *D)
 {
@@ -123,7 +160,7 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTem
     const TemplateParameterList *TPList = D->getTemplateParameters();
     unsigned Index;
     for (Index = 0; Index < TPList->size(); ++Index) {
-        bool res = ConsumerInstance->isValidClassTemplateParam(CanonicalD, Index);
+        bool res = isValidClassTemplateParam(CanonicalD, Index);
         printf("res = %d\n", res);
         if (!res)
             continue;
@@ -134,6 +171,7 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTem
             ConsumerInstance->TheClassTemplateDecl = CanonicalD;
             ConsumerInstance->TheParameterIndex = Index;
             ConsumerInstance->TheTemplateName = new TemplateName(CanonicalD);
+//            ConsumerInstance->TheTemplateArgument = ;
         }
     }
     return true;
@@ -144,7 +182,7 @@ void SubstituteClassTemplateParameter::Initialize(ASTContext &context)
 {
     Transformation::Initialize(context);
     CollectionVisitor = new SubstituteClassTemplateParameterASTVisitor(this);
-    //    ArgRewriteVisitor = new ReduceClassTemplateParameterRewriteVisitor(this);
+    RewriteVisitor = new SubstituteClassTemplateParameterRewriteVisitor(this);
 }
 
 void SubstituteClassTemplateParameter::HandleTranslationUnit(ASTContext &Ctx)
@@ -165,23 +203,14 @@ void SubstituteClassTemplateParameter::HandleTranslationUnit(ASTContext &Ctx)
       return;
     }
 
+    TransAssert(TheClassTemplateDecl && "NULL TheClassTemplateDecl!");
+    TransAssert(RewriteVisitor && "NULL RewriteVisitor!");
     Ctx.getDiagnostics().setSuppressAllDiagnostics(false);
+
+    RewriteVisitor->TraverseDecl(Ctx.getTranslationUnitDecl());
 
     if (Ctx.getDiagnostics().hasErrorOccurred() ||
         Ctx.getDiagnostics().hasFatalErrorOccurred())
       TransError = TransInternalError;
 }
 
-bool SubstituteClassTemplateParameter::isValidClassTemplateParam(clang::ClassTemplateDecl *D, unsigned paramIdx)
-{
-    const TemplateArgument *firstArg = 0;
-    for (ClassTemplateDecl::spec_iterator I = D->spec_begin(), E = D->spec_end();
-            I != E; ++I) {
-        const TemplateArgument &curArg = (*I)->getTemplateArgs()[paramIdx];
-        if (!firstArg)
-            firstArg = &curArg;
-        else if (!curArg.structurallyEquals(*firstArg))
-            return false;
-    }
-    return true;
-}
