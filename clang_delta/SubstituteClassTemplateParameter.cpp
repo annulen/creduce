@@ -63,77 +63,10 @@ private:
 
 bool SubstituteClassTemplateParameterRewriteVisitor::VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc)
 {
-    printf("Here!\n");
+    SourceRange Range = Loc.getSourceRange();
+    ConsumerInstance->TheRewriter.ReplaceText(Range, "...");
     return true;
 }
-
-/*
-static void PrintTemplateParameters(Decl *D,
-    const TemplateParameterList *Params, const TemplateArgumentList *Args = 0) {
-    printf("\nPrintTemplateParameters\n");
-  assert(Params);
-  assert(!Args || Params->size() == Args->size());
-
-  llvm::raw_os_ostream Out(std::cout);
-  PrintingPolicy Policy = D->getASTContext().getPrintingPolicy();
-  Policy.DumpSourceManager = &D->getASTContext().getSourceManager();
-  Out << "template <";
-
-  for (unsigned i = 0, e = Params->size(); i != e; ++i) {
-    if (i != 0)
-      Out << ", ";
-
-    const Decl *Param = Params->getParam(i);
-    if (const TemplateTypeParmDecl *TTP =
-          dyn_cast<TemplateTypeParmDecl>(Param)) {
-
-      if (TTP->wasDeclaredWithTypename())
-        Out << "typename ";
-      else
-        Out << "class ";
-
-      if (TTP->isParameterPack())
-        Out << "... ";
-
-      Out << *TTP;
-
-      if (Args) {
-        Out << " = ";
-        Args->get(i).print(Policy, Out);
-      } else if (TTP->hasDefaultArgument()) {
-        Out << " = ";
-        Out << TTP->getDefaultArgument().getAsString(Policy);
-      };
-    } else if (const NonTypeTemplateParmDecl *NTTP =
-                 dyn_cast<NonTypeTemplateParmDecl>(Param)) {
-      Out << NTTP->getType().getAsString(Policy);
-
-      if (NTTP->isParameterPack() && !isa<PackExpansionType>(NTTP->getType()))
-        Out << "...";
-
-      if (IdentifierInfo *Name = NTTP->getIdentifier()) {
-        Out << ' ';
-        Out << Name->getName();
-      }
-
-      if (Args) {
-        Out << " = ";
-        Args->get(i).print(Policy, Out);
-      } else if (NTTP->hasDefaultArgument()) {
-        Out << " = ";
-        //NTTP->getDefaultArgument()->printPretty(Out, 0, Policy, Indentation);
-      }
-    } else if (const TemplateTemplateParmDecl *TTPD =
-                 dyn_cast<TemplateTemplateParmDecl>(Param)) {
-      //VisitTemplateDecl(TTPD);
-      // FIXME: print the default argument, if present.
-    }
-  }
-
-  Out << "> ";
-  printf("\n");
-}
-*/
 
 bool isValidClassTemplateParam(clang::ClassTemplateDecl *D, unsigned paramIdx)
 {

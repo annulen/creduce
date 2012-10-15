@@ -24,7 +24,7 @@ class SubstituteClassTemplateParameterRewriteVisitor;
 
 class SubstituteClassTemplateParameter : public Transformation {
 friend class SubstituteClassTemplateParameterASTVisitor;
-friend class SubstituteClassTemplateParameterSpecializationTypeRewriteVisitor;
+friend class SubstituteClassTemplateParameterRewriteVisitor;
 
 public:
   SubstituteClassTemplateParameter(const char *TransName, const char *Desc)
