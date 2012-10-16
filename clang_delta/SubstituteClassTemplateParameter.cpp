@@ -55,6 +55,10 @@ public:
         : ConsumerInstance(Instance)
     {}
 
+    bool TraverseTemplateArgumentLoc(const TemplateArgumentLoc& argloc) {
+        return true;
+    }
+
     bool VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc);
 
 private:
