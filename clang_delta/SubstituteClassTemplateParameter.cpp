@@ -63,12 +63,22 @@ private:
 
 bool SubstituteClassTemplateParameterRewriteVisitor::VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc)
 {
-    SourceRange Range = Loc.getSourceRange();
-    ConsumerInstance->TheRewriter.ReplaceText(Range, "...");
+    const TemplateTypeParmType *Ty =
+        dyn_cast<TemplateTypeParmType>(Loc.getTypePtr());
+    TransAssert(Ty && "Invalid TemplateSpecializationType!");
+
+    if (Ty->getIndex() == ConsumerInstance->TheParameterIndex) {
+        PrintingPolicy Policy = ConsumerInstance->TheClassTemplateDecl->getASTContext().getPrintingPolicy();
+        std::string argStr;
+        raw_string_ostream out(argStr);
+        ConsumerInstance->TheTemplateArgument->print(Policy, out);
+        SourceRange Range = Loc.getSourceRange();
+        ConsumerInstance->TheRewriter.ReplaceText(Range, out.str());
+    }
     return true;
 }
 
-bool isValidClassTemplateParam(clang::ClassTemplateDecl *D, unsigned paramIdx)
+const TemplateArgument* isValidClassTemplateParam(clang::ClassTemplateDecl *D, unsigned paramIdx)
 {
     const TemplateArgument *firstArg = 0;
     for (ClassTemplateDecl::spec_iterator I = D->spec_begin(), E = D->spec_end();
@@ -77,9 +87,9 @@ bool isValidClassTemplateParam(clang::ClassTemplateDecl *D, unsigned paramIdx)
         if (!firstArg)
             firstArg = &curArg;
         else if (!curArg.structurallyEquals(*firstArg))
-            return false;
+            return 0;
     }
-    return true;
+    return firstArg;
 }
 
 bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTemplateDecl *D)
@@ -93,9 +103,8 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTem
     const TemplateParameterList *TPList = D->getTemplateParameters();
     unsigned Index;
     for (Index = 0; Index < TPList->size(); ++Index) {
-        bool res = isValidClassTemplateParam(CanonicalD, Index);
-        printf("res = %d\n", res);
-        if (!res)
+        const TemplateArgument *arg = isValidClassTemplateParam(CanonicalD, Index);
+        if (!arg)
             continue;
 
         ConsumerInstance->ValidInstanceNum++;
@@ -104,7 +113,7 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTem
             ConsumerInstance->TheClassTemplateDecl = CanonicalD;
             ConsumerInstance->TheParameterIndex = Index;
             ConsumerInstance->TheTemplateName = new TemplateName(CanonicalD);
-//            ConsumerInstance->TheTemplateArgument = ;
+            ConsumerInstance->TheTemplateArgument = arg;
         }
     }
     return true;

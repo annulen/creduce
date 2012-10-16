@@ -17,6 +17,7 @@
 
 namespace clang {
 class TemplateName;
+class TemplateArgument;
 }
 
 class SubstituteClassTemplateParameterASTVisitor;
@@ -56,6 +57,7 @@ private:
   unsigned TheParameterIndex;
 
   clang::TemplateName *TheTemplateName;
+  const clang::TemplateArgument *TheTemplateArgument;
 
   // Unimplemented
   SubstituteClassTemplateParameter();
