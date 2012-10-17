@@ -33,7 +33,8 @@ public:
       CollectionVisitor(0),
       RewriteVisitor(0),
       TheClassTemplateDecl(0),
-      TheTemplateName(0)
+      TheTemplateName(0),
+      madeTransformation(false)
   {}
 
   ~SubstituteClassTemplateParameter() {}
@@ -58,6 +59,8 @@ private:
 
   clang::TemplateName *TheTemplateName;
   const clang::TemplateArgument *TheTemplateArgument;
+
+  bool madeTransformation;
 
   // Unimplemented
   SubstituteClassTemplateParameter();

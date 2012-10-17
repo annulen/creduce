@@ -137,6 +137,9 @@ void Transformation::getTransErrorMsg(std::string &ErrorMsg)
   else if (TransError == TransNoValidParamsError) {
     ErrorMsg = "No valid parameters declarations exist!";
   }
+  else if (TransError == TransNoValidParameterOccurences) {
+    ErrorMsg = "No valid occurences of template parameter exist!";
+  }
   else {
     TransAssert(0 && "Unknown transformation error!");
   }

@@ -55,11 +55,42 @@ public:
         : ConsumerInstance(Instance)
     {}
 
+//    bool shouldVisitTemplateInstantiations() const { return true; }
+//    bool shouldWalkTypesOfTypeLocs() const { return true; }
+//    bool shouldVisitImplicitCode() const { return true; }
     bool TraverseTemplateArgumentLoc(const TemplateArgumentLoc& argloc) {
         return true;
     }
 
     bool VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc);
+//    bool VisitTemplateDecl(TemplateDecl *D) {
+//        printf("TemplateDecl=\n");
+//        D->getCanonicalDecl()->dump();
+//        return true;
+//    }
+//    bool VisitCompoundStmt(CompoundStmt *Node) {
+//        printf("CompoundStmt=%d\n", Node->size());
+//        Node->dumpAll();
+////        for (CompoundStmt::body_iterator I = Node->body_begin(), E = Node->body_end();
+////                I != E; ++I)
+////            TraverseStmt(*I);
+//        return true;
+//    }
+//    bool VisitDeclRefExpr(DeclRefExpr *Expr) {
+//        printf("DeclRefExpr=\n");
+//        Expr->dump();
+//        return true;
+//    }
+//    bool VisitExpr(Expr *Expr) {
+//        printf("Expr=\n");
+//        Expr->dump();
+//        return true;
+//    }
+//    bool VisitStmt(Stmt *Stmt) {
+//        printf("Stmt=\n");
+//        Stmt->dump();
+//        return true;
+//    }
 
 private:
     SubstituteClassTemplateParameter *ConsumerInstance;
@@ -67,6 +98,7 @@ private:
 
 bool SubstituteClassTemplateParameterRewriteVisitor::VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc)
 {
+    //printf("VisitTemplateTypeParmTypeLoc\n");
     const TemplateTypeParmType *Ty =
         dyn_cast<TemplateTypeParmType>(Loc.getTypePtr());
     TransAssert(Ty && "Invalid TemplateSpecializationType!");
@@ -78,6 +110,7 @@ bool SubstituteClassTemplateParameterRewriteVisitor::VisitTemplateTypeParmTypeLo
         ConsumerInstance->TheTemplateArgument->print(Policy, out);
         SourceRange Range = Loc.getSourceRange();
         ConsumerInstance->TheRewriter.ReplaceText(Range, out.str());
+        ConsumerInstance->madeTransformation = true;
     }
     return true;
 }
@@ -108,7 +141,9 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTem
     unsigned Index;
     for (Index = 0; Index < TPList->size(); ++Index) {
         const TemplateArgument *arg = isValidClassTemplateParam(CanonicalD, Index);
-        if (!arg)
+        if (arg)
+            printf("%d\n", arg->getKind());
+        if (!arg || arg->getKind() != TemplateArgument::Type)
             continue;
 
         ConsumerInstance->ValidInstanceNum++;
@@ -143,7 +178,7 @@ void SubstituteClassTemplateParameter::HandleTranslationUnit(ASTContext &Ctx)
     if (QueryInstanceOnly)
       return;
 
-    printf("ValidInstanceNum=%d \n", ValidInstanceNum);
+    //printf("ValidInstanceNum=%d \n", ValidInstanceNum);
     if (TransformationCounter > ValidInstanceNum) {
       TransError = TransMaxInstanceError;
       return;
@@ -154,6 +189,9 @@ void SubstituteClassTemplateParameter::HandleTranslationUnit(ASTContext &Ctx)
     Ctx.getDiagnostics().setSuppressAllDiagnostics(false);
 
     RewriteVisitor->TraverseDecl(Ctx.getTranslationUnitDecl());
+
+    if (!madeTransformation)
+        TransError = TransNoValidParameterOccurences;
 
     if (Ctx.getDiagnostics().hasErrorOccurred() ||
         Ctx.getDiagnostics().hasFatalErrorOccurred())
