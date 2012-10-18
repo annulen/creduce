@@ -55,42 +55,16 @@ public:
         : ConsumerInstance(Instance)
     {}
 
-//    bool shouldVisitTemplateInstantiations() const { return true; }
-//    bool shouldWalkTypesOfTypeLocs() const { return true; }
-//    bool shouldVisitImplicitCode() const { return true; }
     bool TraverseTemplateArgumentLoc(const TemplateArgumentLoc& argloc) {
         return true;
     }
 
     bool VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc);
-//    bool VisitTemplateDecl(TemplateDecl *D) {
-//        printf("TemplateDecl=\n");
-//        D->getCanonicalDecl()->dump();
-//        return true;
-//    }
-//    bool VisitCompoundStmt(CompoundStmt *Node) {
-//        printf("CompoundStmt=%d\n", Node->size());
-//        Node->dumpAll();
-////        for (CompoundStmt::body_iterator I = Node->body_begin(), E = Node->body_end();
-////                I != E; ++I)
-////            TraverseStmt(*I);
-//        return true;
-//    }
-//    bool VisitDeclRefExpr(DeclRefExpr *Expr) {
-//        printf("DeclRefExpr=\n");
-//        Expr->dump();
-//        return true;
-//    }
-//    bool VisitExpr(Expr *Expr) {
-//        printf("Expr=\n");
-//        Expr->dump();
-//        return true;
-//    }
-//    bool VisitStmt(Stmt *Stmt) {
-//        printf("Stmt=\n");
-//        Stmt->dump();
-//        return true;
-//    }
+    bool VisitDeclRefExpr(DeclRefExpr *Expr) {
+        printf("DeclRefExpr=\n");
+        Expr->dump();
+        return true;
+    }
 
 private:
     SubstituteClassTemplateParameter *ConsumerInstance;
@@ -143,7 +117,7 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTem
         const TemplateArgument *arg = isValidClassTemplateParam(CanonicalD, Index);
         if (arg)
             printf("%d\n", arg->getKind());
-        if (!arg || arg->getKind() != TemplateArgument::Type)
+        if (!arg)// || arg->getKind() != TemplateArgument::Type)
             continue;
 
         ConsumerInstance->ValidInstanceNum++;
