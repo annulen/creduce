@@ -14,10 +14,15 @@
 
 #include "Transformation.h"
 #include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/DenseMap.h"
 
 namespace clang {
+class NamedDecl;
+class TemplateDecl;
 class TemplateName;
 class TemplateArgument;
+class TemplateTypeParmDecl;
+class TemplateTypeParmTypeLoc;
 }
 
 class SubstituteClassTemplateParameterASTVisitor;
@@ -32,35 +37,46 @@ public:
     : Transformation(TransName, Desc),
       CollectionVisitor(0),
       RewriteVisitor(0),
-      TheClassTemplateDecl(0),
-      TheTemplateName(0),
-      madeTransformation(false)
+      TheSourceRange(0)
+//      TheClassTemplateDecl(0),
+//      TheTemplateName(0),
+//      madeTransformation(false)
   {}
 
   ~SubstituteClassTemplateParameter() {}
 
 private:
-  typedef llvm::SmallPtrSet<const clang::ClassTemplateDecl *, 20> 
-            ClassTemplateDeclSet;
+  typedef llvm::SmallPtrSet<const clang::TemplateDecl *, 20> 
+            TemplateDeclSet;
+
+  typedef llvm::DenseMap<const clang::NamedDecl*, const clang::TemplateArgument*>
+            TemplateArgumentForTemplateParameter;
 
   virtual void Initialize(clang::ASTContext &context);
 
   virtual void HandleTranslationUnit(clang::ASTContext &Ctx);
 
-  ClassTemplateDeclSet VisitedDecls;
+  template<typename T>
+  void SaveValidTemplateArguments(T *D);
+
+  TemplateDeclSet VisitedTemplateDecls;
+
+  TemplateArgumentForTemplateParameter ValidArguments;
 
   SubstituteClassTemplateParameterASTVisitor *CollectionVisitor;
 
   SubstituteClassTemplateParameterRewriteVisitor *RewriteVisitor;
 
-  clang::ClassTemplateDecl *TheClassTemplateDecl;
+//  clang::ClassTemplateDecl *TheClassTemplateDecl;
 
-  unsigned TheParameterIndex;
+//  unsigned TheParameterIndex;
 
-  clang::TemplateName *TheTemplateName;
+//  clang::TemplateName *TheTemplateName;
   const clang::TemplateArgument *TheTemplateArgument;
+  //clang::TemplateTypeParmTypeLoc *TheTemplateParmTypeLoc;
 
-  bool madeTransformation;
+  clang::SourceRange *TheSourceRange;
+//  bool madeTransformation;
 
   // Unimplemented
   SubstituteClassTemplateParameter();
