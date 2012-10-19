@@ -23,6 +23,7 @@ class TemplateName;
 class TemplateArgument;
 class TemplateTypeParmDecl;
 class TemplateTypeParmTypeLoc;
+class ClassTemplatePartialSpecializationDecl;
 }
 
 class SubstituteClassTemplateParameterASTVisitor;
@@ -46,7 +47,7 @@ public:
   ~SubstituteClassTemplateParameter() {}
 
 private:
-  typedef llvm::SmallPtrSet<const clang::TemplateDecl *, 20> 
+  typedef llvm::SmallPtrSet<const clang::NamedDecl *, 20> 
             TemplateDeclSet;
 
   typedef llvm::DenseMap<const clang::NamedDecl*, const clang::TemplateArgument*>
@@ -58,6 +59,9 @@ private:
 
   template<typename T>
   void SaveValidTemplateArguments(T *D);
+  template<typename T>
+  const clang::TemplateArgument* ArgForTemplateParam(T *D, unsigned paramIdx);
+  const clang::TemplateArgument* ArgForTemplateParam(clang::ClassTemplatePartialSpecializationDecl *PSD, unsigned paramIdx);
 
   TemplateDeclSet VisitedTemplateDecls;
 

@@ -57,11 +57,12 @@ public:
 //        return true;
 //    }
 
-    bool TraverseTemplateDecl(const TemplateDecl *D) {
-        return true;
-    }
+//    bool TraverseTemplateDecl(const TemplateDecl *D) {
+//        return true;
+//    }
 
     bool VisitClassTemplateDecl(ClassTemplateDecl *D);
+    bool VisitClassTemplatePartialSpecializationDecl(ClassTemplatePartialSpecializationDecl *D);
     //bool VisitFunctionTemplateDecl(FunctionTemplateDecl *D);
     bool VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc);
 
@@ -112,7 +113,7 @@ private:
 //}
 
 template<typename T>
-static const TemplateArgument* ArgForTemplateParam(T *D, unsigned paramIdx)
+const TemplateArgument* SubstituteClassTemplateParameter::ArgForTemplateParam(T *D, unsigned paramIdx)
 {
     const TemplateArgument *firstArg = 0;
     for (typename T::spec_iterator I = D->spec_begin(), E = D->spec_end();
@@ -126,19 +127,43 @@ static const TemplateArgument* ArgForTemplateParam(T *D, unsigned paramIdx)
     return firstArg;
 }
 
+const TemplateArgument* SubstituteClassTemplateParameter::ArgForTemplateParam(ClassTemplatePartialSpecializationDecl *PSD, unsigned paramIdx)
+{
+    ClassTemplateDecl * D = PSD->getSpecializedTemplate();
+    fprintf(stderr, "ArgForTemplateParam %d %d\n", PSD->getTemplateParameters()->size(),
+            PSD->getTemplateArgs().size());
+    const TemplateArgumentList &TAList = PSD->getTemplateArgs();
+    int s = TAList.size();
+    for (int i=0; i < s; ++i) {
+        const TemplateArgument &arg = TAList.get(i);
+        if (arg.getKind() == TemplateArgument::Type) {
+            QualType Ty = arg.getAsType();
+            if (Ty->isTemplateTypeParmType()) {
+                NamedDecl *ND = D->getTemplateParameters()->getParam(i);
+                fprintf(stderr, "param %d %d\n", i, ND);
+//                const TemplateTypeParmType *TTP = static_cast<const TemplateTypeParmType *>(Ty.getTypePtr());
+                fprintf(stderr, "count=%d\n", ValidArguments.count(ND));
+                if (ValidArguments.count(ND))
+                    ValidArguments[PSD->getTemplateParameters()->getParam(paramIdx)] = ValidArguments[ND];
+            }
+        }
+    }
+    return 0;
+}
+
 template<typename T>
 void SubstituteClassTemplateParameter::SaveValidTemplateArguments(T *D)
 {
-    T *CanonicalD = D->getCanonicalDecl();
-    if (VisitedTemplateDecls.count(CanonicalD))
+    if (VisitedTemplateDecls.count(D))
       return;
 
-    VisitedTemplateDecls.insert(CanonicalD);
+    VisitedTemplateDecls.insert(D);
 
-    const TemplateParameterList *TPList = CanonicalD->getTemplateParameters();
+    const TemplateParameterList *TPList = D->getTemplateParameters();
+    fprintf(stderr, "%d\n", TPList->size());
     unsigned Index;
     for (Index = 0; Index < TPList->size(); ++Index) {
-        const TemplateArgument *arg = ArgForTemplateParam(CanonicalD, Index);
+        const TemplateArgument *arg = ArgForTemplateParam(D, Index);
         if (!arg)// || arg->getKind() != TemplateArgument::Type)
             continue;
         ValidArguments[TPList->getParam(Index)] = arg;
@@ -151,7 +176,7 @@ void SubstituteClassTemplateParameter::SaveValidTemplateArguments(T *D)
 //            }
 //        }
         fprintf(stderr, "Added ValidArgument '");
-        std::cerr << ArgumentToString(arg, CanonicalD->getASTContext()) << "'\n";
+        std::cerr << ArgumentToString(arg, D->getASTContext()) << "'\n";
     }
 }
 
@@ -181,6 +206,13 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitTemplateTypeParmTypeLoc(Te
 
 bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTemplateDecl *D)
 {
+    ConsumerInstance->SaveValidTemplateArguments(D->getCanonicalDecl());
+    return true;
+}
+
+bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplatePartialSpecializationDecl(ClassTemplatePartialSpecializationDecl *D)
+{
+    fprintf(stderr, "VisitClassTemplatePartialSpecializationDecl\n");
     ConsumerInstance->SaveValidTemplateArguments(D);
     return true;
 }
