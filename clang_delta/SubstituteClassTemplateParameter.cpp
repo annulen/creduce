@@ -95,8 +95,8 @@ const TemplateArgument* SubstituteClassTemplateParameter::ArgForTemplateParam(T 
 const TemplateArgument* SubstituteClassTemplateParameter::ArgForTemplateParam(ClassTemplatePartialSpecializationDecl *PSD, unsigned paramIdx)
 {
     ClassTemplateDecl * D = PSD->getSpecializedTemplate();
-    fprintf(stderr, "ArgForTemplateParam %d %d\n", PSD->getTemplateParameters()->size(),
-            PSD->getTemplateArgs().size());
+    //fprintf(stderr, "ArgForTemplateParam %d %d\n", PSD->getTemplateParameters()->size(),
+    //        PSD->getTemplateArgs().size());
     const TemplateArgumentList &TAList = PSD->getTemplateArgs();
     int s = TAList.size();
     for (int i=0; i < s; ++i) {
@@ -164,7 +164,6 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitDeclRefExpr(DeclRefExpr *E
 {
     ValueDecl *VD = Expr->getDecl();
     if (NonTypeTemplateParmDecl *NTTPD = dyn_cast<NonTypeTemplateParmDecl>(VD)) {
-        //printf("Here_\n");
         if (ConsumerInstance->ValidArguments.count(NTTPD)) {
             const TemplateArgument *arg = ConsumerInstance->ValidArguments[NTTPD];
             ConsumerInstance->ValidInstanceNum++;
@@ -189,7 +188,6 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplateDecl(ClassTem
 
 bool SubstituteClassTemplateParameterASTVisitor::VisitClassTemplatePartialSpecializationDecl(ClassTemplatePartialSpecializationDecl *D)
 {
-    fprintf(stderr, "VisitClassTemplatePartialSpecializationDecl\n");
     ConsumerInstance->SaveValidTemplateArguments(D);
     return true;
 }
