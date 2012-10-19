@@ -71,6 +71,7 @@ public:
     bool VisitClassTemplatePartialSpecializationDecl(ClassTemplatePartialSpecializationDecl *D);
     //bool VisitFunctionTemplateDecl(FunctionTemplateDecl *D);
     bool VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc);
+    bool VisitDeclRefExpr(DeclRefExpr *Expr);
 
 private:
     SubstituteClassTemplateParameter *ConsumerInstance;
@@ -156,6 +157,27 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitTemplateTypeParmTypeLoc(Te
     }
     else
         fprintf(stderr, "Bad\n");
+    return true;
+}
+
+bool SubstituteClassTemplateParameterASTVisitor::VisitDeclRefExpr(DeclRefExpr *Expr)
+{
+    ValueDecl *VD = Expr->getDecl();
+    if (NonTypeTemplateParmDecl *NTTPD = dyn_cast<NonTypeTemplateParmDecl>(VD)) {
+        //printf("Here_\n");
+        if (ConsumerInstance->ValidArguments.count(NTTPD)) {
+            const TemplateArgument *arg = ConsumerInstance->ValidArguments[NTTPD];
+            ConsumerInstance->ValidInstanceNum++;
+            if (ConsumerInstance->ValidInstanceNum ==
+                    ConsumerInstance->TransformationCounter) {
+                ConsumerInstance->TheTemplateArgument = arg;
+                ConsumerInstance->TheSourceRange = new SourceRange(Expr->getSourceRange());
+            }
+        }
+        else
+            fprintf(stderr, "Bad\n");
+    }
+
     return true;
 }
 
