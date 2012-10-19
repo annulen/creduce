@@ -119,8 +119,6 @@ clang_delta_SOURCES = \
 	RemoveUnresolvedBase.h \
 	RemoveUnusedFunction.cpp \
 	RemoveUnusedFunction.h \
-	RemoveUnusedRecord.cpp \
-	RemoveUnusedRecord.h \
 	RemoveUnusedStructField.cpp \
 	RemoveUnusedStructField.h \
 	RemoveUnusedVar.cpp \

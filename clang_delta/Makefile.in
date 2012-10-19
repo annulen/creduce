@@ -86,7 +86,6 @@ am_clang_delta_OBJECTS = clang_delta-AggregateToScalar.$(OBJEXT) \
 	clang_delta-RemoveTrivialBaseTemplate.$(OBJEXT) \
 	clang_delta-RemoveUnresolvedBase.$(OBJEXT) \
 	clang_delta-RemoveUnusedFunction.$(OBJEXT) \
-	clang_delta-RemoveUnusedRecord.$(OBJEXT) \
 	clang_delta-RemoveUnusedStructField.$(OBJEXT) \
 	clang_delta-RemoveUnusedVar.$(OBJEXT) \
 	clang_delta-RenameClass.$(OBJEXT) \
@@ -379,8 +378,6 @@ clang_delta_SOURCES = \
 	RemoveUnresolvedBase.h \
 	RemoveUnusedFunction.cpp \
 	RemoveUnusedFunction.h \
-	RemoveUnusedRecord.cpp \
-	RemoveUnusedRecord.h \
 	RemoveUnusedStructField.cpp \
 	RemoveUnusedStructField.h \
 	RemoveUnusedVar.cpp \
@@ -546,7 +543,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clang_delta-RemoveTrivialBaseTemplate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clang_delta-RemoveUnresolvedBase.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clang_delta-RemoveUnusedFunction.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clang_delta-RemoveUnusedRecord.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clang_delta-RemoveUnusedStructField.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clang_delta-RemoveUnusedVar.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clang_delta-RenameClass.Po@am__quote@
@@ -996,20 +992,6 @@ clang_delta-RemoveUnusedFunction.obj: RemoveUnusedFunction.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RemoveUnusedFunction.cpp' object='clang_delta-RemoveUnusedFunction.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(clang_delta_CPPFLAGS) $(CPPFLAGS) $(clang_delta_CXXFLAGS) $(CXXFLAGS) -c -o clang_delta-RemoveUnusedFunction.obj `if test -f 'RemoveUnusedFunction.cpp'; then $(CYGPATH_W) 'RemoveUnusedFunction.cpp'; else $(CYGPATH_W) '$(srcdir)/RemoveUnusedFunction.cpp'; fi`
-
-clang_delta-RemoveUnusedRecord.o: RemoveUnusedRecord.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(clang_delta_CPPFLAGS) $(CPPFLAGS) $(clang_delta_CXXFLAGS) $(CXXFLAGS) -MT clang_delta-RemoveUnusedRecord.o -MD -MP -MF $(DEPDIR)/clang_delta-RemoveUnusedRecord.Tpo -c -o clang_delta-RemoveUnusedRecord.o `test -f 'RemoveUnusedRecord.cpp' || echo '$(srcdir)/'`RemoveUnusedRecord.cpp
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/clang_delta-RemoveUnusedRecord.Tpo $(DEPDIR)/clang_delta-RemoveUnusedRecord.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RemoveUnusedRecord.cpp' object='clang_delta-RemoveUnusedRecord.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(clang_delta_CPPFLAGS) $(CPPFLAGS) $(clang_delta_CXXFLAGS) $(CXXFLAGS) -c -o clang_delta-RemoveUnusedRecord.o `test -f 'RemoveUnusedRecord.cpp' || echo '$(srcdir)/'`RemoveUnusedRecord.cpp
-
-clang_delta-RemoveUnusedRecord.obj: RemoveUnusedRecord.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(clang_delta_CPPFLAGS) $(CPPFLAGS) $(clang_delta_CXXFLAGS) $(CXXFLAGS) -MT clang_delta-RemoveUnusedRecord.obj -MD -MP -MF $(DEPDIR)/clang_delta-RemoveUnusedRecord.Tpo -c -o clang_delta-RemoveUnusedRecord.obj `if test -f 'RemoveUnusedRecord.cpp'; then $(CYGPATH_W) 'RemoveUnusedRecord.cpp'; else $(CYGPATH_W) '$(srcdir)/RemoveUnusedRecord.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/clang_delta-RemoveUnusedRecord.Tpo $(DEPDIR)/clang_delta-RemoveUnusedRecord.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='RemoveUnusedRecord.cpp' object='clang_delta-RemoveUnusedRecord.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(clang_delta_CPPFLAGS) $(CPPFLAGS) $(clang_delta_CXXFLAGS) $(CXXFLAGS) -c -o clang_delta-RemoveUnusedRecord.obj `if test -f 'RemoveUnusedRecord.cpp'; then $(CYGPATH_W) 'RemoveUnusedRecord.cpp'; else $(CYGPATH_W) '$(srcdir)/RemoveUnusedRecord.cpp'; fi`
 
 clang_delta-RemoveUnusedStructField.o: RemoveUnusedStructField.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(clang_delta_CPPFLAGS) $(CPPFLAGS) $(clang_delta_CXXFLAGS) $(CXXFLAGS) -MT clang_delta-RemoveUnusedStructField.o -MD -MP -MF $(DEPDIR)/clang_delta-RemoveUnusedStructField.Tpo -c -o clang_delta-RemoveUnusedStructField.o `test -f 'RemoveUnusedStructField.cpp' || echo '$(srcdir)/'`RemoveUnusedStructField.cpp
