@@ -61,6 +61,12 @@ public:
 //        return true;
 //    }
 
+//    bool VisitCXXMethodDecl(CXXMethodDecl *D) {
+//        fprintf(stderr, "CXXMethodDecl=\n");
+//        D->dump();
+//        fprintf(stderr, "\n");
+//        return true;
+//    }
     bool VisitClassTemplateDecl(ClassTemplateDecl *D);
     bool VisitClassTemplatePartialSpecializationDecl(ClassTemplatePartialSpecializationDecl *D);
     //bool VisitFunctionTemplateDecl(FunctionTemplateDecl *D);
@@ -117,7 +123,7 @@ void SubstituteClassTemplateParameter::SaveValidTemplateArguments(T *D)
     VisitedTemplateDecls.insert(D);
 
     const TemplateParameterList *TPList = D->getTemplateParameters();
-    fprintf(stderr, "%d\n", TPList->size());
+    //fprintf(stderr, "%d\n", TPList->size());
     unsigned Index;
     for (Index = 0; Index < TPList->size(); ++Index) {
         const TemplateArgument *arg = ArgForTemplateParam(D, Index);
@@ -191,7 +197,7 @@ void SubstituteClassTemplateParameter::HandleTranslationUnit(ASTContext &Ctx)
     if (QueryInstanceOnly)
       return;
 
-    printf("ValidInstanceNum=%d \n", ValidInstanceNum);
+    fprintf(stderr, "ValidInstanceNum=%d \n", ValidInstanceNum);
     if (TransformationCounter > ValidInstanceNum) {
       TransError = TransMaxInstanceError;
       return;
