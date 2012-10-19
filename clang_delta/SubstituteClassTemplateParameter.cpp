@@ -70,48 +70,6 @@ private:
     SubstituteClassTemplateParameter *ConsumerInstance;
 };
 
-//class SubstituteClassTemplateParameterRewriteVisitor : public
-//   RecursiveASTVisitor<SubstituteClassTemplateParameterRewriteVisitor> {
-//public:
-//    explicit SubstituteClassTemplateParameterRewriteVisitor(
-//            SubstituteClassTemplateParameter *Instance)
-//        : ConsumerInstance(Instance)
-//    {}
-//
-//    bool TraverseTemplateArgumentLoc(const TemplateArgumentLoc& argloc) {
-//        return true;
-//    }
-//
-//    bool VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc);
-//    bool VisitDeclRefExpr(DeclRefExpr *Expr) {
-//        printf("DeclRefExpr=\n");
-//        Expr->dump();
-//        return true;
-//    }
-//
-//private:
-//    SubstituteClassTemplateParameter *ConsumerInstance;
-//};
-//
-//bool SubstituteClassTemplateParameterRewriteVisitor::VisitTemplateTypeParmTypeLoc(TemplateTypeParmTypeLoc Loc)
-//{
-//    //printf("VisitTemplateTypeParmTypeLoc\n");
-//    const TemplateTypeParmType *Ty =
-//        dyn_cast<TemplateTypeParmType>(Loc.getTypePtr());
-//    TransAssert(Ty && "Invalid TemplateSpecializationType!");
-//
-//    if (Ty->getIndex() == ConsumerInstance->TheParameterIndex) {
-//        PrintingPolicy Policy = ConsumerInstance->TheClassTemplateDecl->getASTContext().getPrintingPolicy();
-//        std::string argStr;
-//        raw_string_ostream out(argStr);
-//        ConsumerInstance->TheTemplateArgument->print(Policy, out);
-//        SourceRange Range = Loc.getSourceRange();
-//        ConsumerInstance->TheRewriter.ReplaceText(Range, out.str());
-//        ConsumerInstance->madeTransformation = true;
-//    }
-//    return true;
-//}
-
 template<typename T>
 const TemplateArgument* SubstituteClassTemplateParameter::ArgForTemplateParam(T *D, unsigned paramIdx)
 {
@@ -140,9 +98,8 @@ const TemplateArgument* SubstituteClassTemplateParameter::ArgForTemplateParam(Cl
             QualType Ty = arg.getAsType();
             if (Ty->isTemplateTypeParmType()) {
                 NamedDecl *ND = D->getTemplateParameters()->getParam(i);
-                fprintf(stderr, "param %d %d\n", i, ND);
-//                const TemplateTypeParmType *TTP = static_cast<const TemplateTypeParmType *>(Ty.getTypePtr());
-                fprintf(stderr, "count=%d\n", ValidArguments.count(ND));
+                //fprintf(stderr, "param %d %d\n", i, ND);
+                //fprintf(stderr, "count=%d\n", ValidArguments.count(ND));
                 if (ValidArguments.count(ND))
                     ValidArguments[PSD->getTemplateParameters()->getParam(paramIdx)] = ValidArguments[ND];
             }
@@ -167,16 +124,8 @@ void SubstituteClassTemplateParameter::SaveValidTemplateArguments(T *D)
         if (!arg)// || arg->getKind() != TemplateArgument::Type)
             continue;
         ValidArguments[TPList->getParam(Index)] = arg;
-        // ???
-//        for (typename T::spec_iterator I = D->spec_begin(), E = D->spec_end();
-//                I != E; ++I) {
-//            if ((*I)->classofKind(Decl::ClassTemplatePartialSpecialization)) {
-//                ClassTemplatePartialSpecializationDecl *PSD = static_cast<ClassTemplatePartialSpecializationDecl*>(*I);
-//                ValidArguments[PSD->getTemplateParameters()->getParam(Index)] = arg;
-//            }
-//        }
-        fprintf(stderr, "Added ValidArgument '");
-        std::cerr << ArgumentToString(arg, D->getASTContext()) << "'\n";
+        //fprintf(stderr, "Added ValidArgument '");
+        //std::cerr << ArgumentToString(arg, D->getASTContext()) << "'\n";
     }
 }
 
@@ -186,8 +135,8 @@ bool SubstituteClassTemplateParameterASTVisitor::VisitTemplateTypeParmTypeLoc(Te
         dyn_cast<TemplateTypeParmType>(Loc.getTypePtr());
     TransAssert(Ty && "Invalid TemplateTypeParmType!");
 
-    fprintf(stderr, "Ty = %d Index = %d\n", Ty, Ty->getIndex());
-    Ty->dump();
+    //fprintf(stderr, "Ty = %d Index = %d\n", Ty, Ty->getIndex());
+    //Ty->dump();
 
     TemplateTypeParmDecl *D = Ty->getDecl();
     if (ConsumerInstance->ValidArguments.count(D)) {
