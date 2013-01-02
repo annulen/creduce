@@ -127,7 +127,7 @@ bool TransformationManager::initializeCompilerInstance(std::string &ErrorMsg)
   PP.getBuiltinInfo().InitializeBuiltins(PP.getIdentifierTable(),
                                          PP.getLangOpts());
 
-  if (!ClangInstance->InitializeSourceManager(SrcFileName)) {
+  if (!ClangInstance->InitializeSourceManager(FrontendInputFile(SrcFileName, IK_None))) {
     ErrorMsg = "Cannot open source file!";
     return false;
   }
