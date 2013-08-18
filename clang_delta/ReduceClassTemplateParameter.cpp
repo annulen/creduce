@@ -387,8 +387,8 @@ void ReduceClassTemplateParameter::removeOneParameterByArgType(
   // removing either of the arguments needs to keep the template 
   // parameter
   ArgumentDependencyVisitor AccumV(DependentTypeToVisitsCount);
-  TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten();
-  unsigned NumArgs = PartialD->getNumTemplateArgsAsWritten();
+  const TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten()->getTemplateArgs();
+  unsigned NumArgs = PartialD->getTemplateArgsAsWritten()->NumTemplateArgs;
   TransAssert((TheParameterIndex < NumArgs) && 
                "Bad NumArgs from partial template decl!");
   for (unsigned I = 0; I < NumArgs; ++I) {
@@ -538,7 +538,7 @@ bool ReduceClassTemplateParameter::referToAParameter(
 bool ReduceClassTemplateParameter::isValidForReduction(
        const ClassTemplatePartialSpecializationDecl *PartialD)
 {
-  unsigned NumArgsAsWritten = PartialD->getNumTemplateArgsAsWritten();
+  unsigned NumArgsAsWritten = PartialD->getTemplateArgsAsWritten()->NumTemplateArgs;
   unsigned NumArgs = PartialD->getTemplateInstantiationArgs().size();
 
   if ((NumArgsAsWritten > 0) && 
@@ -552,7 +552,7 @@ bool ReduceClassTemplateParameter::isValidForReduction(
   if (NumArgsAsWritten != NumArgs)
     return false;
 
-  TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten();
+  const TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten()->getTemplateArgs();
   for (unsigned AI = 0; AI < NumArgsAsWritten; ++AI) {
     if (AI == TheParameterIndex)
       continue;
@@ -576,8 +576,8 @@ bool ReduceClassTemplateParameter::reducePartialSpec(
   if (!isValidForReduction(PartialD))
     return false;
 
-  TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten();
-  unsigned NumArgsAsWritten = PartialD->getNumTemplateArgsAsWritten();
+  const TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten()->getTemplateArgs();
+  unsigned NumArgsAsWritten = PartialD->getTemplateArgsAsWritten()->NumTemplateArgs;
   TemplateArgumentLoc FirstArgLoc = ArgLocs[0];
   SourceRange FirstRange = FirstArgLoc.getSourceRange();
   SourceLocation StartLoc = FirstRange.getBegin();
@@ -602,7 +602,7 @@ void ReduceClassTemplateParameter::removeParameterFromPartialSpecs()
   for (SmallVector<ClassTemplatePartialSpecializationDecl *, 10>::iterator 
          I = PartialDecls.begin(), E = PartialDecls.end(); I != E; ++I) {
     const ClassTemplatePartialSpecializationDecl *PartialD = (*I);
-    TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten();
+    const TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten()->getTemplateArgs();
     if (!ArgLocs)
       continue;
 
@@ -616,7 +616,7 @@ void ReduceClassTemplateParameter::removeParameterFromPartialSpecs()
     if (reducePartialSpec(PartialD))
       continue;
 
-    unsigned NumArgs = PartialD->getNumTemplateArgsAsWritten();
+    unsigned NumArgs = PartialD->getTemplateArgsAsWritten()->NumTemplateArgs;
     if ((TheParameterIndex >= NumArgs) && hasDefaultArg)
       return;
 

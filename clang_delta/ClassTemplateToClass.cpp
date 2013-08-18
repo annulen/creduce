@@ -260,12 +260,12 @@ void ClassTemplateToClass::rewriteClassTemplatePartialSpecs(void)
     removeTemplateAndParameter(PartialD->getSourceRange().getBegin(), 
                                PartialD->getTemplateParameters());
 
-    TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten();
+    const TemplateArgumentLoc *ArgLocs = PartialD->getTemplateArgsAsWritten()->getTemplateArgs();
     TransAssert(ArgLocs && "Invalid ArgLocs!");
     TemplateArgumentLoc FirstArgLoc = ArgLocs[0];
     SourceLocation StartLoc = FirstArgLoc.getSourceRange().getBegin();
 
-    unsigned NumArgs = PartialD->getNumTemplateArgsAsWritten();
+    unsigned NumArgs = PartialD->getTemplateArgsAsWritten()->NumTemplateArgs;
     TransAssert((NumArgs > 0) && "Invalid NumArgs!");
     TemplateArgumentLoc LastArgLoc = ArgLocs[NumArgs - 1];
     SourceRange LastRange = LastArgLoc.getSourceRange();
